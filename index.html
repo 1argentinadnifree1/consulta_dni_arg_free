@@ -3,96 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta DNI Gratis</title>
+    <title>Chat IA - Consulta DNI</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 500px;
+
+        .chat-container {
             width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
             text-align: center;
         }
-        h1 {
-            color: #333;
+
+        .chat-header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
             margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
         }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
+
+        .message.ai {
+            justify-content: flex-start;
         }
-        button {
-            width: 100%;
-            padding: 12px;
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .ai .message-bubble {
+            background: white;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .user .message-bubble {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .ai .message-avatar {
             background: #4facfe;
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
         }
-        .result {
-            margin-top: 20px;
+
+        .user .message-avatar {
+            background: #667eea;
+            color: white;
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: inline-flex;
+            margin-left: 5px;
+        }
+
+        .typing-dots span {
+            height: 8px;
+            width: 8px;
+            margin: 0 1px;
+            background-color: #4facfe;
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #4facfe;
+        }
+
+        .chat-input button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        .chat-input button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: bold;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        .data-value {
+            color: #212529;
+            font-weight: 600;
+            text-align: right;
+            font-size: 0.95em;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            background: #d1edff;
+            border: 1px solid #b3d9ff;
+            border-radius: 10px;
             padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            text-align: left;
-            display: none;
+            margin-top: 15px;
+            color: #004085;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            color: #721c24;
+        }
+
+        .timestamp {
+            font-size: 0.7em;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔍 Consulta DNI</h1>
-        <input type="text" id="dniInput" placeholder="Ingresa DNI (ej: 49908512)">
-        <button onclick="consultar()">Consultar</button>
-        <div class="result" id="resultado">
-            <h3>Resultados:</h3>
-            <pre id="datos"></pre>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 Asistente Virtual IA</h1>
+            <p>Consultas REALES de base de datos - Sistema oficial</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Mensajes se agregarán aquí dinámicamente -->
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe tu mensaje... Ej: .dni 49908512" autofocus onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
         </div>
     </div>
 
     <script>
-        async function consultar() {
-            const dni = document.getElementById('dniInput').value;
-            const resultado = document.getElementById('resultado');
-            const datos = document.getElementById('datos');
-            
-            if (!dni) {
-                alert('Ingresa un DNI');
-                return;
-            }
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
 
-            try {
-                // Usar proxy para evitar problemas
-                const proxy = 'https://api.allorigins.win/raw?url=';
-                const url = 'https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/' + dni;
-                
-                const response = await fetch(proxy + encodeURIComponent(url));
-                const data = await response.json();
-                
-                datos.textContent = JSON.stringify(data, null, 2);
-                resultado.style.display = 'block';
-            } catch (error) {
-                datos.textContent = 'Error: ' + error.message;
-                resultado.style.display = 'block';
+        // Mensaje de bienvenida
+        setTimeout(() => {
+            addMessage('ai', '¡Hola! Soy tu asistente virtual de IA. 🤖<br>Puedo ayudarte a consultar información REAL en nuestra base de datos oficial.<br><br>Para consultar un DNI, usa el comando: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong>');
+        }, 500);
+
+        function addMessage(sender, message, isTyping = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const timestamp = new Date().toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            if (isTyping) {
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">IA</div>
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            Consultando base de datos oficial
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="timestamp">${timestamp}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${sender === 'ai' ? 'IA' : 'TÚ'}</div>
+                    <div class="message-bubble">
+                        ${message}
+                        <div class="timestamp">${timestamp}</div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         }
+
+        async function consultarDNIReal(dni) {
+            try {
+                // Usar proxy CORS
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const targetUrl = `https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/${dni}`;
+                
+                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return { success: true, data: data };
+                } else {
+                    return { success: false, error: `Error ${response.status}` };
+                }
+            } catch (error) {
+                return { success: false, error: 'Error de conexión. Intenta nuevamente.' };
+            }
+        }
+
+        function formatearDatosBonitos(datos) {
+            // Si viene como array, tomar el primer elemento
+            const persona = Array.isArray(datos) ? datos[0] : datos;
+            
+            let html = `
+                <div class="result-card">
+                    <div class="data-item">
+                        <span class="data-label">📄 CUIT:</span>
+                        <span class="data-value">${persona.cuit || 'No disponible'}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">👤 Nombre Completo:</span>
+                        <span class="data-value">${persona.nombrecompleto || 'No disponible'}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">🆔 DNI:</span>
+                        <span class="data-value">${persona.dni || 'No disponible'}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">🎂 Fecha Nacimiento:</span>
+                        <span class="data-value">${formatearFecha(persona.fechanacimiento) || 'No disponible'}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">⚧️ Sexo:</span>
+                        <span class="data-value">${formatearSexo(persona.sexo) || 'No disponible'}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">🔢 DNI Calculado:</span>
+                        <span class="data-value">${persona.dni_calculado || 'No disponible'}</span>
+                    </div>
+                    
+                    <button class="copy-btn" onclick="copiarInformacion()">
+                        📋 Copiar Información
+                    </button>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const date = new Date(fecha);
+            return date.toLocaleDateString('es-AR');
+        }
+
+        function formatearSexo(sexo) {
+            if (sexo === 'M') return 'Masculino';
+            if (sexo === 'F') return 'Femenino';
+            return sexo;
+        }
+
+        function copiarInformacion() {
+            const datos = document.querySelector('.result-card');
+            const texto = `
+CUIT: ${datos.querySelector('.data-item:nth-child(1) .data-value').textContent}
+Nombre: ${datos.querySelector('.data-item:nth-child(2) .data-value').textContent}
+DNI: ${datos.querySelector('.data-item:nth-child(3) .data-value').textContent}
+Fecha Nacimiento: ${datos.querySelector('.data-item:nth-child(4) .data-value').textContent}
+Sexo: ${datos.querySelector('.data-item:nth-child(5) .data-value').textContent}
+DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').textContent}
+            `.trim();
+
+            navigator.clipboard.writeText(texto).then(() => {
+                // Mostrar mensaje de éxito
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ ¡Copiado!';
+                btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                }, 2000);
+            });
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Agregar mensaje del usuario
+            addMessage('user', message);
+            userInput.value = '';
+
+            // Procesar el mensaje
+            if (message.startsWith('.dni ')) {
+                const dni = message.split(' ')[1];
+                
+                if (!dni || !/^\d+$/.test(dni)) {
+                    addMessage('ai', '❌ <strong>Error en el formato</strong><br>El DNI debe contener solo números. Ejemplo: <strong>.dni 49908512</strong>');
+                    return;
+                }
+
+                if (dni.length < 7 || dni.length > 8) {
+                    addMessage('ai', '❌ <strong>DNI inválido</strong><br>El DNI debe tener entre 7 y 8 dígitos.');
+                    return;
+                }
+
+                // Mostrar que está consultando
+                addMessage('ai', '', true);
+
+                // Consulta REAL a la API
+                const resultado = await consultarDNIReal(dni);
+                
+                // Remover el indicador de typing
+                chatMessages.removeChild(chatMessages.lastChild);
+                
+                if (resultado.success) {
+                    const datos = resultado.data;
+                    
+                    let mensajeRespuesta = '✅ <strong>Consulta REAL exitosa</strong><br>';
+                    mensajeRespuesta += 'Datos oficiales obtenidos:<br>';
+                    
+                    // Mostrar datos en formato bonito
+                    mensajeRespuesta += formatearDatosBonitos(datos);
+                    
+                    mensajeRespuesta += '<div class="success-message">';
+                    mensajeRespuesta += '✔️ Consulta completada correctamente';
+                    mensajeRespuesta += '</div>';
+                    
+                    addMessage('ai', mensajeRespuesta);
+                    
+                } else {
+                    addMessage('ai', 
+                        '❌ <strong>Error en la consulta</strong><br>' +
+                        resultado.error + '<br><br>' +
+                        '<div class="error-message">' +
+                        '⚠️ No se pudo obtener información. Verifica el DNI o intenta nuevamente.' +
+                        '</div>'
+                    );
+                }
+
+            } else if (message === '.dni') {
+                addMessage('ai', 
+                    '❌ <strong>Falta el número de DNI</strong><br>' +
+                    'Uso correcto: <strong>.dni [número]</strong><br>' +
+                    'Ejemplo: <strong>.dni 49908512</strong>' +
+                    '<div class="command-help">💡 Escribe .dni seguido de un número de 7 u 8 dígitos</div>'
+                );
+            } else if (message === '.help' || message === 'ayuda') {
+                addMessage('ai', 
+                    '🤖 <strong>Comandos disponibles</strong><br><br>' +
+                    '<strong>.dni [número]</strong> - Consultar información REAL por DNI<br>' +
+                    '<strong>.help</strong> - Mostrar esta ayuda<br><br>' +
+                    '<div class="command-help">💡 Ejemplo real: <code>.dni 49908512</code></div>'
+                );
+            } else {
+                addMessage('ai', 
+                    '🤖 <strong>Comando no reconocido</strong><br>' +
+                    'Para consultar un DNI REAL, usa: <strong>.dni [número]</strong><br>' +
+                    'Ejemplo: <strong>.dni 49908512</strong><br><br>' +
+                    'Escribe <strong>.help</strong> para ver todos los comandos disponibles.'
+                );
+            }
+        }
+
+        // Focus en el input al cargar
+        userInput.focus();
     </script>
 </body>
 </html>
