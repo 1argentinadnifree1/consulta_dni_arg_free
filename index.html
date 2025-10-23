@@ -3,127 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat IA - Consulta DNI Argentina</title>
+    <title>Consulta DNI Gratis</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body {
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh; display: flex; justify-content: center; align-items: center;
+            margin: 0;
             padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .chat-container {
-            width: 100%; max-width: 900px; height: 90vh;
-            background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; overflow: hidden;
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
         }
-        .chat-header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white; padding: 20px; text-align: center;
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
         }
-        .chat-messages {
-            flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa;
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
         }
-        .message { margin-bottom: 20px; display: flex; align-items: flex-start; }
-        .message.ai { justify-content: flex-start; }
-        .message.user { justify-content: flex-end; }
-        .message-bubble {
-            max-width: 70%; padding: 15px 20px; border-radius: 20px;
-            background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .user .message-bubble {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4facfe;
             color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
         }
-        .chat-input-container { padding: 20px; background: white; border-top: 1px solid #eee; }
-        .chat-input { display: flex; gap: 10px; }
-        .chat-input input {
-            flex: 1; padding: 15px 20px; border: 2px solid #e1e5e9; border-radius: 25px;
-            outline: none; font-size: 1em;
-        }
-        .chat-input button {
-            padding: 15px 25px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1em;
-        }
-        .result-data {
-            background: #f8f9fa; border: 1px solid #e1e5e9; border-radius: 10px;
-            padding: 15px; margin-top: 10px; font-family: 'Courier New', monospace;
-            font-size: 0.9em; white-space: pre-wrap; max-height: 300px; overflow-y: auto;
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>🤖 Consulta DNI Argentina</h1>
-            <p>Chat IA - Consultas gratuitas</p>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-container">
-            <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe: .dni 12345678" autofocus>
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
+    <div class="container">
+        <h1>🔍 Consulta DNI</h1>
+        <input type="text" id="dniInput" placeholder="Ingresa DNI (ej: 49908512)">
+        <button onclick="consultar()">Consultar</button>
+        <div class="result" id="resultado">
+            <h3>Resultados:</h3>
+            <pre id="datos"></pre>
         </div>
     </div>
 
     <script>
-        const chatMessages = document.getElementById('chatMessages');
-        const userInput = document.getElementById('userInput');
+        async function consultar() {
+            const dni = document.getElementById('dniInput').value;
+            const resultado = document.getElementById('resultado');
+            const datos = document.getElementById('datos');
+            
+            if (!dni) {
+                alert('Ingresa un DNI');
+                return;
+            }
 
-        setTimeout(() => {
-            addMessage('ai', '¡Hola! 🤖<br>Consulta DNI gratis usando: <strong>.dni 49908512</strong>');
-        }, 500);
-
-        function addMessage(sender, message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.innerHTML = `<div class="message-bubble">${message}</div>`;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        async function consultarDNI(dni) {
             try {
-                const response = await fetch(`https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/${dni}`);
-                if (response.ok) {
-                    return { success: true, data: await response.json() };
-                } else {
-                    return { success: false, error: `Error ${response.status}` };
-                }
+                // Usar proxy para evitar problemas
+                const proxy = 'https://api.allorigins.win/raw?url=';
+                const url = 'https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/' + dni;
+                
+                const response = await fetch(proxy + encodeURIComponent(url));
+                const data = await response.json();
+                
+                datos.textContent = JSON.stringify(data, null, 2);
+                resultado.style.display = 'block';
             } catch (error) {
-                return { success: false, error: error.message };
+                datos.textContent = 'Error: ' + error.message;
+                resultado.style.display = 'block';
             }
         }
-
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-
-            addMessage('user', message);
-            userInput.value = '';
-
-            if (message.startsWith('.dni ')) {
-                const dni = message.split(' ')[1];
-                if (dni && /^\d+$/.test(dni)) {
-                    addMessage('ai', '🔍 Consultando DNI: ' + dni + '...');
-                    const resultado = await consultarDNI(dni);
-                    if (resultado.success) {
-                        addMessage('ai', '✅ Datos encontrados:<div class="result-data">' + JSON.stringify(resultado.data, null, 2) + '</div>');
-                    } else {
-                        addMessage('ai', '❌ Error: ' + resultado.error);
-                    }
-                } else {
-                    addMessage('ai', '❌ DNI inválido. Ejemplo: .dni 49908512');
-                }
-            } else {
-                addMessage('ai', '❌ Usa: <strong>.dni 12345678</strong> para consultar');
-            }
-        }
-
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
     </script>
 </body>
 </html>
