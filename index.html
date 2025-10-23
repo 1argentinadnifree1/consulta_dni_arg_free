@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat IA - Consulta DNI</title>
+    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS96mz0d4GhhJbYichKnUgeBDJLMVEL0ZYWFg&s" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -19,6 +20,12 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            animation: backgroundShift 10s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            50% { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         }
 
         .chat-container {
@@ -31,6 +38,12 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            animation: containerPop 0.8s ease-out;
+        }
+
+        @keyframes containerPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .chat-header {
@@ -38,11 +51,59 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
         .chat-header h1 {
             font-size: 1.5em;
             margin-bottom: 5px;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,0.8); }
         }
 
         .chat-header p {
@@ -61,6 +122,33 @@
             margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+
+        .message.user {
+            animation: messageSlideRight 0.5s ease-out;
+        }
+
+        @keyframes messageSlideRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
         }
 
         .message.ai {
@@ -76,41 +164,66 @@
             padding: 15px 20px;
             border-radius: 20px;
             position: relative;
-            animation: fadeIn 0.3s ease-in;
+            animation: bubblePop 0.3s ease-out;
+        }
+
+        @keyframes bubblePop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .ai .message-bubble {
             background: white;
             border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .user .message-bubble {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             border-bottom-right-radius: 5px;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
         }
 
         .message-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             margin: 0 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 0.8em;
+            overflow: hidden;
+            border: 3px solid;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: avatarAppear 0.5s ease-out;
+        }
+
+        @keyframes avatarAppear {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .message-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
         .ai .message-avatar {
-            background: #4facfe;
-            color: white;
+            border-color: #4facfe;
         }
 
         .user .message-avatar {
-            background: #667eea;
-            color: white;
+            border-color: #667eea;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .typing-indicator {
@@ -142,6 +255,12 @@
             padding: 20px;
             background: white;
             border-top: 1px solid #eee;
+            animation: inputSlideUp 0.6s ease-out;
+        }
+
+        @keyframes inputSlideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .chat-input {
@@ -156,11 +275,19 @@
             border-radius: 25px;
             outline: none;
             font-size: 1em;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            animation: inputGrow 0.8s ease-out;
+        }
+
+        @keyframes inputGrow {
+            from { transform: scaleX(0.8); opacity: 0; }
+            to { transform: scaleX(1); opacity: 1; }
         }
 
         .chat-input input:focus {
             border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: scale(1.02);
         }
 
         .chat-input button {
@@ -171,11 +298,23 @@
             border-radius: 25px;
             cursor: pointer;
             font-size: 1em;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            animation: buttonPop 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes buttonPop {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .chat-input button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .chat-input button:active {
+            transform: translateY(0) scale(0.95);
         }
 
         .result-card {
@@ -185,6 +324,18 @@
             padding: 20px;
             margin-top: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: cardReveal 0.6s ease-out;
+        }
+
+        @keyframes cardReveal {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
 
         .data-item {
@@ -193,6 +344,26 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #e9ecef;
+            animation: itemSlide 0.4s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .data-item:nth-child(1) { animation-delay: 0.1s; }
+        .data-item:nth-child(2) { animation-delay: 0.2s; }
+        .data-item:nth-child(3) { animation-delay: 0.3s; }
+        .data-item:nth-child(4) { animation-delay: 0.4s; }
+        .data-item:nth-child(5) { animation-delay: 0.5s; }
+        .data-item:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes itemSlide {
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
         }
 
         .data-item:last-child {
@@ -226,15 +397,22 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            animation: buttonBounce 0.6s ease-out 0.8s both;
+        }
+
+        @keyframes buttonBounce {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
         }
 
         .copy-btn:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.95);
         }
 
         .success-message {
@@ -245,6 +423,12 @@
             margin-top: 15px;
             color: #004085;
             text-align: center;
+            animation: successPulse 2s infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(209, 237, 255, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(209, 237, 255, 0.8); }
         }
 
         .error-message {
@@ -254,6 +438,13 @@
             padding: 15px;
             margin-top: 10px;
             color: #721c24;
+            animation: errorShake 0.5s ease-out;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .timestamp {
@@ -272,13 +463,50 @@
             0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
             40% { transform: scale(1); opacity: 1; }
         }
+
+        /* Scrollbar personalizado */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Efecto de escritura gradual */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid transparent;
+            white-space: pre-wrap;
+            animation: typingCursor 0.8s infinite;
+        }
+
+        @keyframes typingCursor {
+            0%, 100% { border-right-color: transparent; }
+            50% { border-right-color: #4facfe; }
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 Asistente Virtual IA</h1>
-            <p>Consultas REALES de base de datos - Sistema oficial</p>
+            <div class="header-content">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS96mz0d4GhhJbYichKnUgeBDJLMVEL0ZYWFg&s" alt="Logo" class="logo">
+                <div>
+                    <h1>🤖 Asistente Virtual IA</h1>
+                    <p>Consultas REALES de base de datos - Sistema oficial</p>
+                </div>
+            </div>
         </div>
         
         <div class="chat-messages" id="chatMessages">
@@ -297,10 +525,14 @@
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
 
+        // URLs de las imágenes
+        const iaAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS96mz0d4GhhJbYichKnUgeBDJLMVEL0ZYWFg&s';
+        const userAvatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+
         // Mensaje de bienvenida
         setTimeout(() => {
             addMessage('ai', '¡Hola! Soy tu asistente virtual de IA. 🤖<br>Puedo ayudarte a consultar información REAL en nuestra base de datos oficial.<br><br>Para consultar un DNI, usa el comando: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong>');
-        }, 500);
+        }, 800);
 
         function addMessage(sender, message, isTyping = false) {
             const messageDiv = document.createElement('div');
@@ -313,10 +545,12 @@
 
             if (isTyping) {
                 messageDiv.innerHTML = `
-                    <div class="message-avatar">IA</div>
+                    <div class="message-avatar">
+                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    </div>
                     <div class="message-bubble">
                         <div class="typing-indicator">
-                            Consultando base de datos oficial
+                            Escribiendo
                             <div class="typing-dots">
                                 <span></span>
                                 <span></span>
@@ -327,8 +561,13 @@
                     </div>
                 `;
             } else {
+                const avatar = sender === 'ai' ? iaAvatar : userAvatar;
+                const altText = sender === 'ai' ? 'IA' : 'Usuario';
+                
                 messageDiv.innerHTML = `
-                    <div class="message-avatar">${sender === 'ai' ? 'IA' : 'TÚ'}</div>
+                    <div class="message-avatar">
+                        <img src="${avatar}" alt="${altText}" class="avatar-img">
+                    </div>
                     <div class="message-bubble">
                         ${message}
                         <div class="timestamp">${timestamp}</div>
@@ -339,6 +578,43 @@
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+// Función para escritura gradual - CORREGIDA
+function typeWriterEffect(element, text, speed = 30) {
+    return new Promise((resolve) => {
+        let i = 0;
+        let inTag = false;
+        let currentTag = '';
+        element.innerHTML = '';
+        
+        function type() {
+            if (i < text.length) {
+                const char = text.charAt(i);
+                
+                if (char === '<') {
+                    inTag = true;
+                    currentTag = '';
+                }
+                
+                if (inTag) {
+                    currentTag += char;
+                    if (char === '>') {
+                        inTag = false;
+                        element.innerHTML += currentTag;
+                    }
+                } else {
+                    element.innerHTML += char;
+                }
+                
+                i++;
+                setTimeout(type, speed);
+            } else {
+                resolve();
+            }
+        }
+        type();
+    });
+}
 
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
@@ -450,22 +726,54 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
             addMessage('user', message);
             userInput.value = '';
 
+            // Delay antes de responder (1-2 segundos)
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+
+            // Mostrar indicador de typing
+            addMessage('ai', '', true);
+
             // Procesar el mensaje
             if (message.startsWith('.dni ')) {
                 const dni = message.split(' ')[1];
                 
                 if (!dni || !/^\d+$/.test(dni)) {
-                    addMessage('ai', '❌ <strong>Error en el formato</strong><br>El DNI debe contener solo números. Ejemplo: <strong>.dni 49908512</strong>');
+                    // Remover typing y mostrar error con escritura gradual
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'message ai';
+                    errorDiv.innerHTML = `
+                        <div class="message-avatar">
+                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                        </div>
+                        <div class="message-bubble">
+                            <div class="typewriter" id="errorMessage"></div>
+                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(errorDiv);
+                    
+                    await typeWriterEffect(document.getElementById('errorMessage'), '❌ <strong>Error en el formato</strong><br>El DNI debe contener solo números. Ejemplo: <strong>.dni 49908512</strong>');
                     return;
                 }
 
                 if (dni.length < 7 || dni.length > 8) {
-                    addMessage('ai', '❌ <strong>DNI inválido</strong><br>El DNI debe tener entre 7 y 8 dígitos.');
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'message ai';
+                    errorDiv.innerHTML = `
+                        <div class="message-avatar">
+                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                        </div>
+                        <div class="message-bubble">
+                            <div class="typewriter" id="errorMessage2"></div>
+                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(errorDiv);
+                    
+                    await typeWriterEffect(document.getElementById('errorMessage2'), '❌ <strong>DNI inválido</strong><br>El DNI debe tener entre 7 y 8 dígitos.');
                     return;
                 }
-
-                // Mostrar que está consultando
-                addMessage('ai', '', true);
 
                 // Consulta REAL a la API
                 const resultado = await consultarDNIReal(dni);
@@ -476,50 +784,96 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                 if (resultado.success) {
                     const datos = resultado.data;
                     
-                    let mensajeRespuesta = '✅ <strong>Consulta REAL exitosa</strong><br>';
-                    mensajeRespuesta += 'Datos oficiales obtenidos:<br>';
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'message ai';
+                    responseDiv.innerHTML = `
+                        <div class="message-avatar">
+                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                        </div>
+                        <div class="message-bubble">
+                            <div class="typewriter" id="successMessage"></div>
+                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(responseDiv);
                     
-                    // Mostrar datos en formato bonito
-                    mensajeRespuesta += formatearDatosBonitos(datos);
+                    await typeWriterEffect(document.getElementById('successMessage'), '✅ <strong>Consulta REAL exitosa</strong><br>Datos oficiales obtenidos:<br>');
                     
-                    mensajeRespuesta += '<div class="success-message">';
-                    mensajeRespuesta += '✔️ Consulta completada correctamente';
-                    mensajeRespuesta += '</div>';
-                    
-                    addMessage('ai', mensajeRespuesta);
+                    // Agregar los datos formateados después del mensaje
+                    const datosDiv = document.createElement('div');
+                    datosDiv.innerHTML = formatearDatosBonitos(datos) + '<div class="success-message">✔️ Consulta completada correctamente</div>';
+                    responseDiv.querySelector('.message-bubble').appendChild(datosDiv);
                     
                 } else {
-                    addMessage('ai', 
-                        '❌ <strong>Error en la consulta</strong><br>' +
-                        resultado.error + '<br><br>' +
-                        '<div class="error-message">' +
-                        '⚠️ No se pudo obtener información. Verifica el DNI o intenta nuevamente.' +
-                        '</div>'
-                    );
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'message ai';
+                    errorDiv.innerHTML = `
+                        <div class="message-avatar">
+                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                        </div>
+                        <div class="message-bubble">
+                            <div class="typewriter" id="apiErrorMessage"></div>
+                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(errorDiv);
+                    
+                    await typeWriterEffect(document.getElementById('apiErrorMessage'), '❌ <strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">⚠️ No se pudo obtener información. Verifica el DNI o intenta nuevamente.</div>');
                 }
 
             } else if (message === '.dni') {
-                addMessage('ai', 
-                    '❌ <strong>Falta el número de DNI</strong><br>' +
-                    'Uso correcto: <strong>.dni [número]</strong><br>' +
-                    'Ejemplo: <strong>.dni 49908512</strong>' +
-                    '<div class="command-help">💡 Escribe .dni seguido de un número de 7 u 8 dígitos</div>'
-                );
+                chatMessages.removeChild(chatMessages.lastChild);
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'message ai';
+                helpDiv.innerHTML = `
+                    <div class="message-avatar">
+                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    </div>
+                    <div class="message-bubble">
+                        <div class="typewriter" id="helpMessage"></div>
+                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(helpDiv);
+                
+                await typeWriterEffect(document.getElementById('helpMessage'), '❌ <strong>Falta el número de DNI</strong><br>Uso correcto: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><div class="command-help">💡 Escribe .dni seguido de un número de 7 u 8 dígitos</div>');
+                
             } else if (message === '.help' || message === 'ayuda') {
-                addMessage('ai', 
-                    '🤖 <strong>Comandos disponibles</strong><br><br>' +
-                    '<strong>.dni [número]</strong> - Consultar información REAL por DNI<br>' +
-                    '<strong>.help</strong> - Mostrar esta ayuda<br><br>' +
-                    '<div class="command-help">💡 Ejemplo real: <code>.dni 49908512</code></div>'
-                );
+                chatMessages.removeChild(chatMessages.lastChild);
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'message ai';
+                helpDiv.innerHTML = `
+                    <div class="message-avatar">
+                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    </div>
+                    <div class="message-bubble">
+                        <div class="typewriter" id="helpCommands"></div>
+                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(helpDiv);
+                
+                await typeWriterEffect(document.getElementById('helpCommands'), '🤖 <strong>Comandos disponibles</strong><br><br><strong>.dni [número]</strong> - Consultar información REAL por DNI<br><strong>.help</strong> - Mostrar esta ayuda<br><br><div class="command-help">💡 Ejemplo real: <code>.dni 49908512</code></div>');
+                
             } else {
-                addMessage('ai', 
-                    '🤖 <strong>Comando no reconocido</strong><br>' +
-                    'Para consultar un DNI REAL, usa: <strong>.dni [número]</strong><br>' +
-                    'Ejemplo: <strong>.dni 49908512</strong><br><br>' +
-                    'Escribe <strong>.help</strong> para ver todos los comandos disponibles.'
-                );
+                chatMessages.removeChild(chatMessages.lastChild);
+                const unknownDiv = document.createElement('div');
+                unknownDiv.className = 'message ai';
+                unknownDiv.innerHTML = `
+                    <div class="message-avatar">
+                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    </div>
+                    <div class="message-bubble">
+                        <div class="typewriter" id="unknownMessage"></div>
+                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(unknownDiv);
+                
+                await typeWriterEffect(document.getElementById('unknownMessage'), '🤖 <strong>Comando no reconocido</strong><br>Para consultar un DNI REAL, usa: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><br>Escribe <strong>.help</strong> para ver todos los comandos disponibles.');
             }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         // Focus en el input al cargar
