@@ -752,7 +752,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                     `;
                     chatMessages.appendChild(errorDiv);
                     
-                    await typeWriterEffect(document.getElementById('errorMessage'), '❌ <strong>Error en el formato</strong><br>El DNI debe contener solo números. Ejemplo: <strong>.dni 49908512</strong>');
+                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '❌ <strong>Error en el formato</strong><br>El DNI debe contener solo números. Ejemplo: <strong>.dni 49908512</strong>');
                     return;
                 }
 
@@ -771,7 +771,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                     `;
                     chatMessages.appendChild(errorDiv);
                     
-                    await typeWriterEffect(document.getElementById('errorMessage2'), '❌ <strong>DNI inválido</strong><br>El DNI debe tener entre 7 y 8 dígitos.');
+                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '❌ <strong>DNI inválido</strong><br>El DNI debe tener entre 7 y 8 dígitos.');
                     return;
                 }
 
@@ -797,7 +797,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                     `;
                     chatMessages.appendChild(responseDiv);
                     
-                    await typeWriterEffect(document.getElementById('successMessage'), '✅ <strong>Consulta REAL exitosa</strong><br>Datos oficiales obtenidos:<br>');
+                    await typeWriterEffect(responseDiv.querySelector('.typewriter'), '✅ <strong>Consulta REAL exitosa</strong><br>Datos oficiales obtenidos:<br>');
                     
                     // Agregar los datos formateados después del mensaje
                     const datosDiv = document.createElement('div');
@@ -818,7 +818,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                     `;
                     chatMessages.appendChild(errorDiv);
                     
-                    await typeWriterEffect(document.getElementById('apiErrorMessage'), '❌ <strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">⚠️ No se pudo obtener información. Verifica el DNI o intenta nuevamente.</div>');
+                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '❌ <strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">⚠️ No se pudo obtener información. Verifica el DNI o intenta nuevamente.</div>');
                 }
 
             } else if (message === '.dni') {
@@ -836,7 +836,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                 `;
                 chatMessages.appendChild(helpDiv);
                 
-                await typeWriterEffect(document.getElementById('helpMessage'), '❌ <strong>Falta el número de DNI</strong><br>Uso correcto: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><div class="command-help">💡 Escribe .dni seguido de un número de 7 u 8 dígitos</div>');
+                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '❌ <strong>Falta el número de DNI</strong><br>Uso correcto: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><div class="command-help">💡 Escribe .dni seguido de un número de 7 u 8 dígitos</div>');
                 
             } else if (message === '.help' || message === 'ayuda') {
                 chatMessages.removeChild(chatMessages.lastChild);
@@ -853,7 +853,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                 `;
                 chatMessages.appendChild(helpDiv);
                 
-                await typeWriterEffect(document.getElementById('helpCommands'), '🤖 <strong>Comandos disponibles</strong><br><br><strong>.dni [número]</strong> - Consultar información REAL por DNI<br><strong>.help</strong> - Mostrar esta ayuda<br><br><div class="command-help">💡 Ejemplo real: <code>.dni 49908512</code></div>');
+                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '🤖 <strong>Comandos disponibles</strong><br><br><strong>.dni [número]</strong> - Consultar información REAL por DNI<br><strong>.help</strong> - Mostrar esta ayuda<br><br><div class="command-help">💡 Ejemplo real: <code>.dni 49908512</code></div>');
                 
             } else {
                 chatMessages.removeChild(chatMessages.lastChild);
@@ -870,7 +870,7 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
                 `;
                 chatMessages.appendChild(unknownDiv);
                 
-                await typeWriterEffect(document.getElementById('unknownMessage'), '🤖 <strong>Comando no reconocido</strong><br>Para consultar un DNI REAL, usa: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><br>Escribe <strong>.help</strong> para ver todos los comandos disponibles.');
+                await typeWriterEffect(unknownDiv.querySelector('.typewriter'), '🤖 <strong>Comando no reconocido</strong><br>Para consultar un DNI REAL, usa: <strong>.dni [número]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><br>Escribe <strong>.help</strong> para ver todos los comandos disponibles.');
             }
             
             chatMessages.scrollTop = chatMessages.scrollHeight;
