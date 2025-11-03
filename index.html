@@ -511,14 +511,14 @@
             <div class="header-content">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS96mz0d4GhhJbYichKnUgeBDJLMVEL0ZYWFg&s" alt="Logo" class="logo">
                 <div>
-                    <h1>馃 Asistente Virtual IA</h1>
+                    <h1>Asistente Virtual IA</h1>
                     <p>Consultas REALES de base de datos - Sistema oficial</p>
                 </div>
             </div>
         </div>
         
         <div class="chat-messages" id="chatMessages">
-            <!-- Mensajes se agregar谩n aqu铆 din谩micamente -->
+            <!-- Mensajes se agregarán aquí dinámicamente -->
         </div>
         
         <div class="chat-input-container">
@@ -533,17 +533,17 @@
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
 
-        // URLs de las im谩genes
+        // URLs de las imágenes
         const iaAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS96mz0d4GhhJbYichKnUgeBDJLMVEL0ZYWFg&s';
         const userAvatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 
-        // Configuraci贸n de OpenRouter (REEMPLAZA CON TU API KEY)
-        const OPENROUTER_API_KEY = "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"; // <- REEMPLAZA ESTO
-        const OPENROUTER_MODEL = "minimax/minimax-m2:free";
+        // Configuración de OpenRouter (REEMPLAZA CON TU API KEY)
+        const OPENROUTER_API_KEY = "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"; // <- PON TU API KEY AQUÍ
+        const OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free";
 
         // Mensaje de bienvenida
         setTimeout(() => {
-            addMessage('ai', '隆Hola! Soy tu asistente virtual de IA. 馃<br>Puedo ayudarte a consultar informaci贸n REAL en nuestra base de datos oficial.<br><br>Para consultar un DNI, usa: <strong>.dni [n煤mero]</strong><br>Para consultar una IP, usa: <strong>.ip [direcci贸n]</strong><br>Para consultar un BIN, usa: <strong>.bin [n煤mero]</strong><br>Para conversar con IA real, escribe cualquier mensaje normal<br>Ejemplos: <strong>.dni 49908512</strong>, <strong>.ip 8.8.8.8</strong> o <strong>.bin 473248</strong>');
+            addMessage('ai', '¡Hola! Soy tu asistente virtual de IA. 💻<br>Puedo ayudarte a consultar información REAL en nuestra base de datos oficial.<br><br>Para consultar un DNI, usa: <strong>.dni [número]</strong><br>Para consultar una IP, usa: <strong>.ip [dirección]</strong><br>Para consultar un BIN, usa: <strong>.bin [número]</strong><br>Para conversar con IA real, escribe cualquier mensaje normal<br>Ejemplos: <strong>.dni 49908512</strong>, <strong>.ip 8.8.8.8</strong> o <strong>.bin 473248</strong>');
         }, 800);
 
         function addMessage(sender, message, isTyping = false) {
@@ -591,7 +591,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Funci贸n para escritura gradual - CORREGIDA
+        // Función para escritura gradual
         function typeWriterEffect(element, text, speed = 30) {
             return new Promise((resolve) => {
                 let i = 0;
@@ -636,7 +636,6 @@
 
         async function consultarDNIReal(dni) {
             try {
-                // Usar proxy CORS
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const targetUrl = `https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/${dni}`;
                 
@@ -649,7 +648,7 @@
                     return { success: false, error: `Error ${response.status}` };
                 }
             } catch (error) {
-                return { success: false, error: 'Error de conexi贸n. Intenta nuevamente.' };
+                return { success: false, error: 'Error de conexión. Intenta nuevamente.' };
             }
         }
 
@@ -664,7 +663,7 @@
                     return { success: false, error: `Error ${response.status}` };
                 }
             } catch (error) {
-                return { success: false, error: 'Error de conexi贸n. Intenta nuevamente.' };
+                return { success: false, error: 'Error de conexión. Intenta nuevamente.' };
             }
         }
 
@@ -679,19 +678,27 @@
                     return { success: false, error: `Error ${response.status}` };
                 }
             } catch (error) {
-                return { success: false, error: 'Error de conexi贸n. Intenta nuevamente.' };
+                return { success: false, error: 'Error de conexión. Intenta nuevamente.' };
             }
         }
 
-        // NUEVA FUNCI脫N: Consultar IA Real
+        // Función mejorada: Consultar IA Real
         async function consultarIAReal(mensaje) {
+            // Si no hay API key, mostrar mensaje informativo
+            if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY.trim() === "") {
+                return { 
+                    success: false, 
+                    error: 'Configura tu API key de OpenRouter primero. Ve a https://openrouter.ai/ para obtener una.' 
+                };
+            }
+
             try {
                 const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
                         "Content-Type": "application/json",
-                        "HTTP-Referer": "https://tu-sitio.com",
+                        "HTTP-Referer": window.location.origin,
                         "X-Title": "Asistente IA"
                     },
                     body: JSON.stringify({
@@ -712,6 +719,7 @@
                         data: data.choices[0].message.content 
                     };
                 } else {
+                    const errorText = await response.text();
                     return { 
                         success: false, 
                         error: `Error ${response.status}: ${response.statusText}` 
@@ -720,44 +728,43 @@
             } catch (error) {
                 return { 
                     success: false, 
-                    error: 'Error de conexi贸n con la IA. Intenta nuevamente.' 
+                    error: 'Error de conexión con la IA. Intenta nuevamente.' 
                 };
             }
         }
 
         function formatearDatosDNI(datos) {
-            // Si viene como array, tomar el primer elemento
             const persona = Array.isArray(datos) ? datos[0] : datos;
             
             let html = `
                 <div class="result-card">
                     <div class="data-item">
-                        <span class="data-label">馃搫 CUIT:</span>
+                        <span class="data-label">📊 CUIT:</span>
                         <span class="data-value">${persona.cuit || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃懁 Nombre Completo:</span>
+                        <span class="data-label">👤 Nombre Completo:</span>
                         <span class="data-value">${persona.nombrecompleto || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃啍 DNI:</span>
+                        <span class="data-label">🆔 DNI:</span>
                         <span class="data-value">${persona.dni || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃巶 Fecha Nacimiento:</span>
+                        <span class="data-label">🎂 Fecha Nacimiento:</span>
                         <span class="data-value">${formatearFecha(persona.fechanacimiento) || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">鈿э笍 Sexo:</span>
+                        <span class="data-label">⚧️ Sexo:</span>
                         <span class="data-value">${formatearSexo(persona.sexo) || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃敘 DNI Calculado:</span>
+                        <span class="data-label">🔢 DNI Calculado:</span>
                         <span class="data-value">${persona.dni_calculado || 'No disponible'}</span>
                     </div>
                     
                     <button class="copy-btn" onclick="copiarInformacionDNI()">
-                        馃搵 Copiar Informaci贸n
+                        📋 Copiar Información
                     </button>
                 </div>
             `;
@@ -771,47 +778,47 @@
             let html = `
                 <div class="result-card">
                     <div class="data-item">
-                        <span class="data-label">馃寪 Direcci贸n IP:</span>
+                        <span class="data-label">🌐 Dirección IP:</span>
                         <span class="data-value">${ipData.ip || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃搷 Pa铆s:</span>
+                        <span class="data-label">🇺🇳 País:</span>
                         <span class="data-value">
                             ${ipData.flag ? `<img src="${ipData.flag.img}" alt="${ipData.country}" class="flag-img">` : ''}
                             ${ipData.country || 'No disponible'} (${ipData.country_code || 'N/A'})
                         </span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃椇锔?Regi贸n/Provincia:</span>
+                        <span class="data-label">🏙️ Región/Provincia:</span>
                         <span class="data-value">${ipData.region || 'No disponible'} (${ipData.region_code || 'N/A'})</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃彊锔?Ciudad:</span>
+                        <span class="data-label">🏠 Ciudad:</span>
                         <span class="data-value">${ipData.city || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃摦 C贸digo Postal:</span>
+                        <span class="data-label">📮 Código Postal:</span>
                         <span class="data-value">${ipData.postal || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃實 Continente:</span>
+                        <span class="data-label">🌍 Continente:</span>
                         <span class="data-value">${ipData.continent || 'No disponible'} (${ipData.continent_code || 'N/A'})</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃搷 Coordenadas:</span>
+                        <span class="data-label">📍 Coordenadas:</span>
                         <span class="data-value">${ipData.latitude || 'N/A'}, ${ipData.longitude || 'N/A'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃彚 ISP:</span>
+                        <span class="data-label">🏢 ISP:</span>
                         <span class="data-value">${ipData.connection?.isp || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃晵 Zona Horaria:</span>
+                        <span class="data-label">🕐 Zona Horaria:</span>
                         <span class="data-value">${ipData.timezone?.id || 'No disponible'} (${ipData.timezone?.utc || 'N/A'})</span>
                     </div>
                     
                     <button class="copy-btn" onclick="copiarInformacionIP()">
-                        馃搵 Copiar Informaci贸n
+                        📋 Copiar Información
                     </button>
                 </div>
             `;
@@ -825,44 +832,44 @@
             let html = `
                 <div class="result-card">
                     <div class="data-item">
-                        <span class="data-label">馃敘 BIN Consultado:</span>
-                        <span class="data-value">${binData.Status === 'SUCCESS' ? '鉁?V谩lido' : '鉂?Inv谩lido'}</span>
+                        <span class="data-label">🔢 BIN Consultado:</span>
+                        <span class="data-value">${binData.Status === 'SUCCESS' ? '✅ Válido' : '❌ Inválido'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃挸 Esquema:</span>
+                        <span class="data-label">💳 Esquema:</span>
                         <span class="data-value">${binData.Scheme || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃彟 Tipo:</span>
+                        <span class="data-label">📝 Tipo:</span>
                         <span class="data-value">${binData.Type || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃彌锔?Emisor:</span>
+                        <span class="data-label">🏦 Emisor:</span>
                         <span class="data-value">${binData.Issuer || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">猸?Nivel:</span>
+                        <span class="data-label">⭐ Nivel:</span>
                         <span class="data-value">${binData.CardTier || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃實 Pa铆s:</span>
+                        <span class="data-label">🌍 País:</span>
                         <span class="data-value">${binData.Country?.Name || 'No disponible'} (${binData.Country?.A2 || 'N/A'})</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃М Algoritmo Luhn:</span>
-                        <span class="data-value">${binData.Luhn ? '鉁?V谩lido' : '鉂?Inv谩lido'}</span>
+                        <span class="data-label">🔍 Algoritmo Luhn:</span>
+                        <span class="data-value">${binData.Luhn ? '✅ Válido' : '❌ Inválido'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃椇锔?Continente:</span>
+                        <span class="data-label">🗺️ Continente:</span>
                         <span class="data-value">${binData.Country?.Cont || 'No disponible'}</span>
                     </div>
                     <div class="data-item">
-                        <span class="data-label">馃摓 C贸digo Pa铆s:</span>
+                        <span class="data-label">📞 Código País:</span>
                         <span class="data-value">${binData.Country?.ISD || 'No disponible'}</span>
                     </div>
                     
                     <button class="copy-btn" onclick="copiarInformacionBIN()">
-                        馃搵 Copiar Informaci贸n
+                        📋 Copiar Información
                     </button>
                 </div>
             `;
@@ -894,10 +901,9 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
             `.trim();
 
             navigator.clipboard.writeText(texto).then(() => {
-                // Mostrar mensaje de 茅xito
                 const btn = document.querySelector('.copy-btn');
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '鉁?隆Copiado!';
+                btn.innerHTML = '✅ ¡Copiado!';
                 btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
                 
                 setTimeout(() => {
@@ -911,10 +917,10 @@ DNI Calculado: ${datos.querySelector('.data-item:nth-child(6) .data-value').text
             const datos = document.querySelector('.result-card');
             const texto = `
 IP: ${datos.querySelector('.data-item:nth-child(1) .data-value').textContent}
-Pa铆s: ${datos.querySelector('.data-item:nth-child(2) .data-value').textContent.replace(/<[^>]*>/g, '')}
-Regi贸n: ${datos.querySelector('.data-item:nth-child(3) .data-value').textContent}
+País: ${datos.querySelector('.data-item:nth-child(2) .data-value').textContent.replace(/<[^>]*>/g, '')}
+Región: ${datos.querySelector('.data-item:nth-child(3) .data-value').textContent}
 Ciudad: ${datos.querySelector('.data-item:nth-child(4) .data-value').textContent}
-C贸digo Postal: ${datos.querySelector('.data-item:nth-child(5) .data-value').textContent}
+Código Postal: ${datos.querySelector('.data-item:nth-child(5) .data-value').textContent}
 Continente: ${datos.querySelector('.data-item:nth-child(6) .data-value').textContent}
 Coordenadas: ${datos.querySelector('.data-item:nth-child(7) .data-value').textContent}
 ISP: ${datos.querySelector('.data-item:nth-child(8) .data-value').textContent}
@@ -922,10 +928,9 @@ Zona Horaria: ${datos.querySelector('.data-item:nth-child(9) .data-value').textC
             `.trim();
 
             navigator.clipboard.writeText(texto).then(() => {
-                // Mostrar mensaje de 茅xito
                 const btn = document.querySelector('.copy-btn');
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '鉁?隆Copiado!';
+                btn.innerHTML = '✅ ¡Copiado!';
                 btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
                 
                 setTimeout(() => {
@@ -938,22 +943,21 @@ Zona Horaria: ${datos.querySelector('.data-item:nth-child(9) .data-value').textC
         function copiarInformacionBIN() {
             const datos = document.querySelector('.result-card');
             const texto = `
-BIN Status: ${datos.querySelector('.data-item:nth-child(1) .data-value').textContent}
+BIN: ${datos.querySelector('.data-item:nth-child(1) .data-value').textContent}
 Esquema: ${datos.querySelector('.data-item:nth-child(2) .data-value').textContent}
 Tipo: ${datos.querySelector('.data-item:nth-child(3) .data-value').textContent}
 Emisor: ${datos.querySelector('.data-item:nth-child(4) .data-value').textContent}
 Nivel: ${datos.querySelector('.data-item:nth-child(5) .data-value').textContent}
-Pa铆s: ${datos.querySelector('.data-item:nth-child(6) .data-value').textContent}
-Algoritmo Luhn: ${datos.querySelector('.data-item:nth-child(7) .data-value').textContent}
+País: ${datos.querySelector('.data-item:nth-child(6) .data-value').textContent}
+Luhn: ${datos.querySelector('.data-item:nth-child(7) .data-value').textContent}
 Continente: ${datos.querySelector('.data-item:nth-child(8) .data-value').textContent}
-C贸digo Pa铆s: ${datos.querySelector('.data-item:nth-child(9) .data-value').textContent}
+Código País: ${datos.querySelector('.data-item:nth-child(9) .data-value').textContent}
             `.trim();
 
             navigator.clipboard.writeText(texto).then(() => {
-                // Mostrar mensaje de 茅xito
                 const btn = document.querySelector('.copy-btn');
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '鉁?隆Copiado!';
+                btn.innerHTML = '✅ ¡Copiado!';
                 btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
                 
                 setTimeout(() => {
@@ -971,406 +975,153 @@ C贸digo Pa铆s: ${datos.querySelector('.data-item:nth-child(9) .data-value').te
             addMessage('user', message);
             userInput.value = '';
 
-            // Delay antes de responder (1-2 segundos)
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
-
-            // Mostrar indicador de typing
+            // Mostrar indicador de escritura
             addMessage('ai', '', true);
 
-            // Procesar el mensaje
+            // Procesar comandos especiales
             if (message.startsWith('.dni ')) {
                 const dni = message.split(' ')[1];
-                
-                if (!dni || !/^\d+$/.test(dni)) {
-                    // Remover typing y mostrar error con escritura gradual
+                if (dni && /^\d+$/.test(dni)) {
+                    const resultado = await consultarDNIReal(dni);
+                    
+                    // Remover indicador de escritura
                     chatMessages.removeChild(chatMessages.lastChild);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="errorMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
                     
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en el formato</strong><br>El DNI debe contener solo n煤meros. Ejemplo: <strong>.dni 49908512</strong>');
-                    return;
-                }
-
-                if (dni.length < 7 || dni.length > 8) {
-                    chatMessages.removeChild(chatMessages.lastChild);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="errorMessage2"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>DNI inv谩lido</strong><br>El DNI debe tener entre 7 y 8 d铆gitos.');
-                    return;
-                }
-
-                // Consulta REAL a la API
-                const resultado = await consultarDNIReal(dni);
-                
-                // Remover el indicador de typing
-                chatMessages.removeChild(chatMessages.lastChild);
-                
-                if (resultado.success) {
-                    const datos = resultado.data;
-                    
-                    const responseDiv = document.createElement('div');
-                    responseDiv.className = 'message ai';
-                    responseDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="successMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(responseDiv);
-                    
-                    await typeWriterEffect(responseDiv.querySelector('.typewriter'), '鉁?<strong>Consulta REAL exitosa</strong><br>Datos oficiales obtenidos:<br>');
-                    
-                    // Agregar los datos formateados despu茅s del mensaje
-                    const datosDiv = document.createElement('div');
-                    datosDiv.innerHTML = formatearDatosDNI(datos) + '<div class="success-message">鉁旓笍 Consulta completada correctamente</div>';
-                    responseDiv.querySelector('.message-bubble').appendChild(datosDiv);
-                    
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="apiErrorMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">鈿狅笍 No se pudo obtener informaci贸n. Verifica el DNI o intenta nuevamente.</div>');
-                }
-
-            } else if (message.startsWith('.ip ')) {
-                const ip = message.split(' ')[1];
-                
-                if (!ip || !/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
-                    chatMessages.removeChild(chatMessages.lastChild);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="ipErrorMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en el formato</strong><br>La IP debe tener un formato v谩lido. Ejemplo: <strong>.ip 8.8.8.8</strong>');
-                    return;
-                }
-
-                // Consulta REAL a la API de IP
-                const resultado = await consultarIPReal(ip);
-                
-                // Remover el indicador de typing
-                chatMessages.removeChild(chatMessages.lastChild);
-                
-                if (resultado.success) {
-                    const datos = resultado.data;
-                    
-                    if (!datos.success) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'message ai';
-                        errorDiv.innerHTML = `
-                            <div class="message-avatar">
-                                <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    if (resultado.success) {
+                        const datosFormateados = formatearDatosDNI(resultado.data);
+                        addMessage('ai', `
+                            <div class="success-message">
+                                ✅ <strong>Consulta REAL exitosa</strong><br>
+                                Datos oficiales obtenidos:
                             </div>
-                            <div class="message-bubble">
-                                <div class="typewriter" id="ipApiErrorMessage"></div>
-                                <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+                            ${datosFormateados}
+                            <div class="success-message">
+                                ✅ Consulta completada correctamente
                             </div>
-                        `;
-                        chatMessages.appendChild(errorDiv);
-                        
-                        await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>IP no v谩lida</strong><br>No se pudo obtener informaci贸n para la IP proporcionada.<br><br><div class="error-message">鈿狅笍 Verifica la direcci贸n IP e intenta nuevamente.</div>');
-                        return;
+                        `);
+                    } else {
+                        addMessage('ai', `
+                            <div class="error-message">
+                                ❌ <strong>Error en la consulta de DNI</strong><br>
+                                ${resultado.error}
+                            </div>
+                        `);
                     }
-                    
-                    const responseDiv = document.createElement('div');
-                    responseDiv.className = 'message ai';
-                    responseDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="ipSuccessMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(responseDiv);
-                    
-                    await typeWriterEffect(responseDiv.querySelector('.typewriter'), '鉁?<strong>Consulta de IP REAL exitosa</strong><br>Datos de geolocalizaci贸n obtenidos:<br>');
-                    
-                    // Agregar los datos formateados despu茅s del mensaje
-                    const datosDiv = document.createElement('div');
-                    datosDiv.innerHTML = formatearDatosIP(datos) + '<div class="success-message">鉁旓笍 Consulta de IP completada correctamente</div>';
-                    responseDiv.querySelector('.message-bubble').appendChild(datosDiv);
-                    
                 } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="ipErrorApiMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">鈿狅笍 No se pudo obtener informaci贸n. Verifica la IP o intenta nuevamente.</div>');
-                }
-
-            } else if (message.startsWith('.bin ')) {
-                const bin = message.split(' ')[1];
-                
-                if (!bin || !/^\d+$/.test(bin)) {
                     chatMessages.removeChild(chatMessages.lastChild);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
+                    addMessage('ai', `
+                        <div class="error-message">
+                            ❌ <strong>Formato incorrecto</strong><br>
+                            Usa: .dni [número] (solo números)
                         </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="binErrorMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en el formato</strong><br>El BIN debe contener solo n煤meros. Ejemplo: <strong>.bin 473248</strong>');
-                    return;
+                    `);
                 }
-
-                if (bin.length < 6 || bin.length > 8) {
-                    chatMessages.removeChild(chatMessages.lastChild);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="binErrorMessage2"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>BIN inv谩lido</strong><br>El BIN debe tener entre 6 y 8 d铆gitos.');
-                    return;
-                }
-
-                // Consulta REAL a la API de BIN
-                const resultado = await consultarBINReal(bin);
-                
-                // Remover el indicador de typing
-                chatMessages.removeChild(chatMessages.lastChild);
-                
-                if (resultado.success) {
-                    const datos = resultado.data;
-                    
-                    if (datos.Status !== 'SUCCESS') {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'message ai';
-                        errorDiv.innerHTML = `
-                            <div class="message-avatar">
-                                <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                            </div>
-                            <div class="message-bubble">
-                                <div class="typewriter" id="binApiErrorMessage"></div>
-                                <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                            </div>
-                        `;
-                        chatMessages.appendChild(errorDiv);
-                        
-                        await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>BIN no encontrado</strong><br>No se encontr贸 informaci贸n para el BIN proporcionado.<br><br><div class="error-message">鈿狅笍 Verifica el BIN e intenta nuevamente.</div>');
-                        return;
-                    }
-                    
-                    const responseDiv = document.createElement('div');
-                    responseDiv.className = 'message ai';
-                    responseDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="binSuccessMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(responseDiv);
-                    
-                    await typeWriterEffect(responseDiv.querySelector('.typewriter'), '鉁?<strong>Consulta de BIN REAL exitosa</strong><br>Informaci贸n de la tarjeta:<br>');
-                    
-                    // Agregar los datos formateados despu茅s del mensaje
-                    const datosDiv = document.createElement('div');
-                    datosDiv.innerHTML = formatearDatosBIN(datos) + '<div class="success-message">鉁旓笍 Consulta de BIN completada correctamente</div>';
-                    responseDiv.querySelector('.message-bubble').appendChild(datosDiv);
-                    
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="binErrorApiMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en la consulta</strong><br>' + resultado.error + '<br><br><div class="error-message">鈿狅笍 No se pudo obtener informaci贸n. Verifica el BIN o intenta nuevamente.</div>');
-                }
-
-            } else if (message === '.dni') {
-                chatMessages.removeChild(chatMessages.lastChild);
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'message ai';
-                helpDiv.innerHTML = `
-                    <div class="message-avatar">
-                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                    </div>
-                    <div class="message-bubble">
-                        <div class="typewriter" id="helpMessage"></div>
-                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                    </div>
-                `;
-                chatMessages.appendChild(helpDiv);
-                
-                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '鉂?<strong>Falta el n煤mero de DNI</strong><br>Uso correcto: <strong>.dni [n煤mero]</strong><br>Ejemplo: <strong>.dni 49908512</strong><br><div class="command-help">馃挕 Escribe .dni seguido de un n煤mero de 7 u 8 d铆gitos</div>');
-                
-            } else if (message === '.ip') {
-                chatMessages.removeChild(chatMessages.lastChild);
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'message ai';
-                helpDiv.innerHTML = `
-                    <div class="message-avatar">
-                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                    </div>
-                    <div class="message-bubble">
-                        <div class="typewriter" id="helpMessage"></div>
-                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                    </div>
-                `;
-                chatMessages.appendChild(helpDiv);
-                
-                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '鉂?<strong>Falta la direcci贸n IP</strong><br>Uso correcto: <strong>.ip [direcci贸n]</strong><br>Ejemplo: <strong>.ip 8.8.8.8</strong><br><div class="command-help">馃挕 Escribe .ip seguido de una direcci贸n IP v谩lida</div>');
-                
-            } else if (message === '.bin') {
-                chatMessages.removeChild(chatMessages.lastChild);
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'message ai';
-                helpDiv.innerHTML = `
-                    <div class="message-avatar">
-                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                    </div>
-                    <div class="message-bubble">
-                        <div class="typewriter" id="helpMessage"></div>
-                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                    </div>
-                `;
-                chatMessages.appendChild(helpDiv);
-                
-                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '鉂?<strong>Falta el n煤mero de BIN</strong><br>Uso correcto: <strong>.bin [n煤mero]</strong><br>Ejemplo: <strong>.bin 473248</strong><br><div class="command-help">馃挕 Escribe .bin seguido de un n煤mero de 6 a 8 d铆gitos</div>');
-                
-            } else if (message === '.help' || message === 'ayuda') {
-                chatMessages.removeChild(chatMessages.lastChild);
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'message ai';
-                helpDiv.innerHTML = `
-                    <div class="message-avatar">
-                        <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                    </div>
-                    <div class="message-bubble">
-                        <div class="typewriter" id="helpCommands"></div>
-                        <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                    </div>
-                `;
-                chatMessages.appendChild(helpDiv);
-                
-                await typeWriterEffect(helpDiv.querySelector('.typewriter'), '馃 <strong>Comandos disponibles</strong><br><br><strong>.dni [n煤mero]</strong> - Consultar informaci贸n REAL por DNI<br><strong>.ip [direcci贸n]</strong> - Consultar informaci贸n REAL por IP<br><strong>.bin [n煤mero]</strong> - Consultar informaci贸n de tarjeta por BIN<br><strong>.help</strong> - Mostrar esta ayuda<br><br><div class="command-help">馃挕 Ejemplos: <code>.dni 49908512</code>, <code>.ip 8.8.8.8</code>, <code>.bin 473248</code><br>馃挕 Para conversar con IA real, escribe cualquier mensaje normal</div>');
-                
-            } else {
-                // NUEVO: Consulta a IA Real para mensajes normales
-                const resultado = await consultarIAReal(message);
-                
-                // Remover el indicador de typing
-                chatMessages.removeChild(chatMessages.lastChild);
-                
-                if (resultado.success) {
-                    const responseDiv = document.createElement('div');
-                    responseDiv.className = 'message ai';
-                    responseDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="iaResponse"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(responseDiv);
-                    
-                    await typeWriterEffect(responseDiv.querySelector('.typewriter'), resultado.data);
-                    
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message ai';
-                    errorDiv.innerHTML = `
-                        <div class="message-avatar">
-                            <img src="${iaAvatar}" alt="IA" class="avatar-img">
-                        </div>
-                        <div class="message-bubble">
-                            <div class="typewriter" id="iaErrorMessage"></div>
-                            <div class="timestamp">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorDiv);
-                    
-                    await typeWriterEffect(errorDiv.querySelector('.typewriter'), '鉂?<strong>Error en la consulta de IA</strong><br>' + resultado.error + '<br><br><div class="error-message">鈿狅笍 No se pudo conectar con la IA. Intenta nuevamente.</div>');
-                }
+                return;
             }
+
+            if (message.startsWith('.ip ')) {
+                const ip = message.split(' ')[1];
+                if (ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
+                    const resultado = await consultarIPReal(ip);
+                    
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    
+                    if (resultado.success) {
+                        const datosFormateados = formatearDatosIP(resultado.data);
+                        addMessage('ai', `
+                            <div class="success-message">
+                                ✅ <strong>Consulta REAL exitosa</strong><br>
+                                Datos oficiales obtenidos:
+                            </div>
+                            ${datosFormateados}
+                            <div class="success-message">
+                                ✅ Consulta completada correctamente
+                            </div>
+                        `);
+                    } else {
+                        addMessage('ai', `
+                            <div class="error-message">
+                                ❌ <strong>Error en la consulta de IP</strong><br>
+                                ${resultado.error}
+                            </div>
+                        `);
+                    }
+                } else {
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    addMessage('ai', `
+                        <div class="error-message">
+                            ❌ <strong>Formato incorrecto</strong><br>
+                            Usa: .ip [dirección] (ejemplo: .ip 8.8.8.8)
+                        </div>
+                    `);
+                }
+                return;
+            }
+
+            if (message.startsWith('.bin ')) {
+                const bin = message.split(' ')[1];
+                if (bin && /^\d{6,}$/.test(bin)) {
+                    const resultado = await consultarBINReal(bin);
+                    
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    
+                    if (resultado.success) {
+                        const datosFormateados = formatearDatosBIN(resultado.data);
+                        addMessage('ai', `
+                            <div class="success-message">
+                                ✅ <strong>Consulta REAL exitosa</strong><br>
+                                Datos oficiales obtenidos:
+                            </div>
+                            ${datosFormateados}
+                            <div class="success-message">
+                                ✅ Consulta completada correctamente
+                            </div>
+                        `);
+                    } else {
+                        addMessage('ai', `
+                            <div class="error-message">
+                                ❌ <strong>Error en la consulta de BIN</strong><br>
+                                ${resultado.error}
+                            </div>
+                        `);
+                    }
+                } else {
+                    chatMessages.removeChild(chatMessages.lastChild);
+                    addMessage('ai', `
+                        <div class="error-message">
+                            ❌ <strong>Formato incorrecto</strong><br>
+                            Usa: .bin [número] (mínimo 6 dígitos)
+                        </div>
+                    `);
+                }
+                return;
+            }
+
+            // Consulta de IA normal
+            const resultado = await consultarIAReal(message);
             
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatMessages.removeChild(chatMessages.lastChild);
+            
+            if (resultado.success) {
+                addMessage('ai', resultado.data);
+            } else {
+                addMessage('ai', `
+                    <div class="error-message">
+                        ❌ <strong>Error en la consulta de IA</strong><br>
+                        Error 401: ${resultado.error}<br><br>
+                        💡 No se pudo conectar con la IA. Intenta nuevamente.
+                    </div>
+                `);
+            }
         }
 
-        // Focus en el input al cargar
-        userInput.focus();
+        // Efectos de entrada para elementos principales
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.chat-container, .chat-header, .chat-input-container');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
     </script>
 </body>
 </html>
